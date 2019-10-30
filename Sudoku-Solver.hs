@@ -1,7 +1,7 @@
 -- CS3210 - Principles of Programming Languages - Fall 2019
 -- Programming Assignment 02 - A Sudoku Solver
--- Author(s): WRITE YOUR NAME(S) HERE
--- Date:
+-- Author(s): Chris Johnson & Monce Romero
+-- Date:10/29/2019
 
 import System.Environment
 import System.IO
@@ -46,7 +46,8 @@ toIntList s = [ toInt [c] | c <- s ]
 --   [0,0,0,4,1,9,0,0,5],
 --   [0,0,0,0,8,0,0,7,9] ]
 -- hint: use lines to convert the string into a list of strings, and then apply toIntList on each of the strings of the list to return the board
--- getBoard :: [Char] -> Board
+getBoard :: [Char] -> Board
+getBoard s = map toIntList (lines s)
 
 -- TODO #2
 -- name: getNRows
@@ -64,7 +65,8 @@ toIntList s = [ toInt [c] | c <- s ]
 --   [0,0,0,4,1,9,0,0,5],
 --   [0,0,0,0,8,0,0,7,9] ] yields 9
 -- hint: use length
--- getNRows :: Board -> Int
+getNRows :: Board -> Int
+getNRows s = length s
 
 -- TODO #3
 -- name: getNCols
@@ -331,6 +333,10 @@ toIntList s = [ toInt [c] | c <- s ]
 -- program starts here
 main = do
 
+   let x = "5487567\n762891"
+   print(getBoard x)
+   print(getNRows(getBoard x))
+
   -- TODO #17: validate the command-line and get the file name containing the board
 
   -- TODO #18: read the contents of the board file into a string
@@ -341,4 +347,4 @@ main = do
 
   -- TODO #21: print the solutions found
 
-  print "Done!"
+  -- print "Done!"
