@@ -46,7 +46,8 @@ toIntList s = [ toInt [c] | c <- s ]
 --   [0,0,0,4,1,9,0,0,5],
 --   [0,0,0,0,8,0,0,7,9] ]
 -- hint: use lines to convert the string into a list of strings, and then apply toIntList on each of the strings of the list to return the board
--- getBoard :: [Char] -> Board
+getBoard :: [Char] -> Board
+getBoard s = map toIntList(lines s)
 
 -- TODO #2
 -- name: getNRows
