@@ -6,6 +6,9 @@
 import System.Environment
 import System.IO
 import Data.List
+import Data.Typeable
+import System.Directory
+import System.Exit
 
 type Sequence = [Int]
 type Board    = [Sequence]
@@ -331,15 +334,29 @@ getBoard s = map toIntList(lines s)
 
 -- program starts here
 main = do
+    putStrLn "What is the name of the file? Do not include extension."
+    inputStr <- getLine
+    let fileName = inputStr ++ ".txt"
+    x <- doesFileExist fileName
+    putStrLn fileName
+    if x
+        then putStrLn"file Exists"
+        else die "bye"
+
+    contents <- readFile fileName
+    --board <- (getBoard contents)
+    putStrLn (show (typeOf (getBoard contents)))
+
 
   -- TODO #17: validate the command-line and get the file name containing the board
-
+    -- done
   -- TODO #18: read the contents of the board file into a string
-
+    -- done
   -- TODO #19: create a board from the string board (hint: use getBoard)
+    -- done
 
   -- TODO #20: use solve to find the solutions, disconsidering the ones that are [[]]
 
   -- TODO #21: print the solutions found
 
-  print "Done!"
+  --print "Done!"
