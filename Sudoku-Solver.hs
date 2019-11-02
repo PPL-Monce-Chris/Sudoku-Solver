@@ -98,6 +98,12 @@ getBoard s = map toIntList(lines s)
 -- hint: use length to create a list with all the sizes of each row from the board; then decide whether all of the rows have the same size, returning that size if yes, or 0 otherwise
 -- getNCols :: Board -> Int
 
+-- ned to test
+getNCols :: Board -> Int
+getNCols b
+  | all (==length (head b)) [length x | x <- b] = length (head b)
+  | otherwise = 0
+
 -- TODO #4
 -- name: getBox
 -- description: given a board and box coordinates, return the correspondent box as a sequence
@@ -135,6 +141,16 @@ getBoard s = map toIntList(lines s)
 -- getEmptySpot :: Board -> (Int, Int)
 
 -- ***** PREDICATE FUNCTIONS *****
+-- need to test
+getEmptySpot :: Board -> (Int, Int)
+getEmptySpot b = head [(x, y) | x <- [0..8], y <- [0..8], (b !! y) !! x == 0]
+-- x and y might need to be swapped at the end
+
+or
+ -- need to test
+emptyLocations b = [(row, col) | row <- [0..8], col <- [0..8], b ! (row, col) == 0]
+Can't get b ! (row, col) == 0 to work
+
 
 -- TODO #6
 -- name: isGridValid
@@ -172,6 +188,12 @@ getBoard s = map toIntList(lines s)
 -- hint: use getNRows and getNCols
 -- isGridValid :: Board -> Bool
 
+-- need to test
+
+isGridValid :: Board -> Bool
+isGridValid b = getNRows b == getNCols b
+
+
 -- TODO #7
 -- name: isSequenceValid
 -- description: return True/False depending whether the given sequence is valid or not, according to sudoku rules
@@ -182,6 +204,11 @@ getBoard s = map toIntList(lines s)
 -- hint: build a list with the digits from the given sequence that are different than zero; then determine whether there are digits that repeats in the created list
 -- isSequenceValid :: Sequence -> Bool
 
+-- need to test
+isSequenceValid :: Sequence -> Bool
+isSequenceValid s = [xs | xs <- s, xs > 0] == nub [xs | xs <- s, xs > 0 ]
+
+
 -- TODO #8
 -- name: areRowsValid
 -- description: return True/False depending whether ALL of the row sequences are valid or not
@@ -189,6 +216,9 @@ getBoard s = map toIntList(lines s)
 -- output: True/False
 -- hint: use list comprehension and isSequenceValid
 -- areRowsValid :: Board -> Bool
+-- need to test
+areRowsValid :: Board -> Bool
+areRowsValid b = and [isSequenceValid xs | xs <- b]
 
 -- TODO #9
 -- name: areColsValid
@@ -197,6 +227,9 @@ getBoard s = map toIntList(lines s)
 -- output: True/False
 -- hint: use areRowsValid of the transposed board
 -- areColsValid :: Board -> Bool
+-- need to test
+areColsValid :: Board -> Bool
+areColsValid b = areRowsValid (transpose b)
 
 -- TODO #10
 -- name: areBoxesValid
