@@ -1,7 +1,7 @@
 -- CS3210 - Principles of Programming Languages - Fall 2019
 -- Programming Assignment 02 - A Sudoku Solver
--- Author(s): Chris Johnson, Monce Romero
--- Date: 10/31/19
+-- Author(s): WRITE YOUR NAME(S) HERE
+-- Date:
 
 import System.Environment
 import System.IO
@@ -34,14 +34,76 @@ toIntList s = [ toInt [c] | c <- s ]
 -- ***** GETTER FUNCTIONS *****
 
 -- TODO #1
+{-
+ name: getBoard
+description: convert given string to a sudoku board
+input: a string (the board as read from a sudoku input file)
+output: a sudoku board
+example: getBoard "530070000\n600195000\n098000060\n800060003\n400803001\n700020006\n060000280\n000419005\n000080079\n" yields
+[ [5,3,0,0,7,0,0,0,0],
+[6,0,0,1,9,5,0,0,0],
+[0,9,8,0,0,0,0,6,0],
+[8,0,0,0,6,0,0,0,3],
+[4,0,0,8,0,3,0,0,1],
+[7,0,0,0,2,0,0,0,6],
+[0,6,0,0,0,0,2,8,0],
+[0,0,0,4,1,9,0,0,5],
+[0,0,0,0,8,0,0,7,9] ]
+hint: use lines to convert the string into a list of strings, and then apply toIntList on each of the strings of the list to return the board
+-}
 getBoard :: [Char] -> Board
 getBoard s = map toIntList(lines s)
 
 -- TODO #2
+{-
+name: getNRows
+description: given a board, return its number of rows
+input: a board
+output: number of rows
+example: getNRows
+[ [5,3,0,0,7,0,0,0,0],
+[6,0,0,1,9,5,0,0,0],
+[0,9,8,0,0,0,0,6,0],
+[8,0,0,0,6,0,0,0,3],
+[4,0,0,8,0,3,0,0,1],
+[7,0,0,0,2,0,0,0,6],
+[0,6,0,0,0,0,2,8,0],
+[0,0,0,4,1,9,0,0,5],
+[0,0,0,0,8,0,0,7,9] ] yields 9
+hint: use length
+-}
 getNRows :: Board -> Int
 getNRows r = length(r)
 
 -- TODO #3
+{-
+name: getNCols
+description: given a board, return its number of columns or 0 if rows do not have the same number of columns
+input: a board
+output: number of columns
+example 1: getNCols
+[ [5,3,0,0,7,0,0,0,0],
+[6,0,0,1,9,5,0,0,0],
+[0,9,8,0,0,0,0,6,0],
+[8,0,0,0,6,0,0,0,3],
+[4,0,0,8,0,3,0,0,1],
+[7,0,0,0,2,0,0,0,6],
+[0,6,0,0,0,0,2,8,0],
+[0,0,0,4,1,9,0,0,5],
+[0,0,0,0,8,0,0,7,9] ] yields 9
+example 2: getNCols
+[ [5,3,0,0,7,0,0,0,0],
+[6,0,0,1,9,5,0,0,0],
+[0,9,8,0,0,0,6,0],
+[8,0,0,0,6,0,3],
+[4,0,0,8,0,3,0,0,1],
+[7,0,0,0,2,0,0,0,6],
+[0,6,0,0],
+[0,0,0,4,1,9,0,0,5],
+[0,0,0,0,8,0,0,7,9] ] yields 0
+hint: use length to create a list with all the sizes of each row from the board; then decide whether all of the rows have the same size, returning that size if yes, or 0 otherwise
+-}
+
 -- ned to test
 getNCols :: Board -> Int
 getNCols b
@@ -49,35 +111,130 @@ getNCols b
   | otherwise = 0
 
 -- TODO #4
--- need to test
+{-
+name: getBox
+description: given a board and box coordinates, return the correspondent box as a sequence
+input: a board and two integer (box coordinates)
+output: a sequence
+example: getBox
+[ [5,3,0,0,7,0,0,0,0],
+[6,0,0,1,9,5,0,0,0],
+[0,9,8,0,0,0,0,6,0],
+[8,0,0,0,6,0,0,0,3],
+[4,0,0,8,0,3,0,0,1],
+[7,0,0,0,2,0,0,0,6],
+[0,6,0,0,0,0,2,8,0],
+[0,0,0,4,1,9,0,0,5],
+[0,0,0,0,8,0,0,7,9] ] 1 1 yields [0,8,0,6,0,2,0,3,0]
+hint: use list comprehension to filter the rows of the target box; then transpose what you got and apply the same reasoning to filter the columns; use concat to return the sequence
+-}
 getBox :: Board -> Int -> Int -> Sequence
-getBox board l1 l2 = concat [(drop l1)]
-
---slice s b e = (drop b . take e) s
-
 
 -- TODO #5
+-- name: getEmptySpot
+-- description: given a board, return the first location that is empty (i.e., it has zero), if one exists; OK to assume that you will only call this function when you know that there is an empty spot
+-- input: a board
+-- output: a tuple with the coordinates (i, j) of the empty spot found
+-- example: getEmptySpot
+-- [ [5,3,0,0,7,0,0,0,0],
+--   [6,0,0,1,9,5,0,0,0],
+--   [0,9,8,0,0,0,0,6,0],
+--   [8,0,0,0,6,0,0,0,3],
+--   [4,0,0,8,0,3,0,0,1],
+--   [7,0,0,0,2,0,0,0,6],
+--   [0,6,0,0,0,0,2,8,0],
+--   [0,0,0,4,1,9,0,0,5],
+--   [0,0,0,0,8,0,0,7,9] ] yields (0,2)
+-- hint: use list comprehension to generate all the coordinates of the board that are empty; use head to return the first coordinate of your list
+-- getEmptySpot :: Board -> (Int, Int)
+
+-- ***** PREDICATE FUNCTIONS *****
 -- need to test
 getEmptySpot :: Board -> (Int, Int)
 getEmptySpot b = head [(x, y) | x <- [0..8], y <- [0..8], (b !! y) !! x == 0]
 -- x and y might need to be swapped at the end
 
+-- or
+ -- need to test
+--emptyLocations b = [(row, col) | row <- [0..8], col <- [0..8], b ! (row, col) == 0]
+-- Can't get b ! (row, col) == 0 to work
+
+
 -- TODO #6
+-- name: isGridValid
+-- description: given a board, return True/False depending whether the given board constitutes a valid grid (i.e., #rows = #cols = 9) or not
+-- input: a board
+-- output: True/False
+-- example 1: isGridValid
+-- [ [5,3,0,0,7,0,0,0,0],
+--   [6,0,0,1,9,5,0,0,0],
+--   [0,9,8,0,0,0,0,6,0],
+--   [8,0,0,0,6,0,0,0,3],
+--   [4,0,0,8,0,3,0,0,1],
+--   [7,0,0,0,2,0,0,0,6],
+--   [0,6,0,0,0,0,2,8,0],
+--   [0,0,0,4,1,9,0,0,5],
+--   [0,0,0,0,8,0,0,7,9] ] yields True
+-- example 2:
+-- [ [5,3,0,0,7,0,0,0,0],
+--   [6,0,0,1,9,5,0,0,0],
+--   [8,0,0,0,6,0,0,0,3],
+--   [4,0,0,8,0,3,0,0,1],
+--   [7,0,0,0,2,0,0,0,6],
+--   [0,6,0,0,0,0,2,8,0],
+--   [0,0,0,4,1,9,0,0,5],
+--   [0,0,0,0,8,0,0,7,9] ] returns False
+-- example 3:
+-- [ [5,3,0,7,0,0,0,0],
+--   [6,0,1,9,5,0,0,0],
+--   [8,0,0,6,0,0,0,3],
+--   [4,0,8,0,3,0,0,1],
+--   [7,0,0,2,0,0,0,6],
+--   [0,0,0,0,0,2,8,0],
+--   [0,0,4,1,9,0,0,5],
+--   [0,0,0,8,0,0,7,9] ] returns False
+-- hint: use getNRows and getNCols
+-- isGridValid :: Board -> Bool
+
 -- need to test
+
 isGridValid :: Board -> Bool
 isGridValid b = getNRows b == getNCols b
 
+
 -- TODO #7
+-- name: isSequenceValid
+-- description: return True/False depending whether the given sequence is valid or not, according to sudoku rules
+-- input: a sequence of digits from 0-9
+-- output: True/False
+-- example 1: isSequenceValid [5,3,0,0,7,0,0,0,0] yields True
+-- example 2: isSequenceValid [5,3,0,5,7,0,0,0,0] yields False
+-- hint: build a list with the digits from the given sequence that are different than zero; then determine whether there are digits that repeats in the created list
+-- isSequenceValid :: Sequence -> Bool
+
 -- need to test
 isSequenceValid :: Sequence -> Bool
 isSequenceValid s = [xs | xs <- s, xs > 0] == nub [xs | xs <- s, xs > 0 ]
 
+
 -- TODO #8
+-- name: areRowsValid
+-- description: return True/False depending whether ALL of the row sequences are valid or not
+-- input: a board
+-- output: True/False
+-- hint: use list comprehension and isSequenceValid
+-- areRowsValid :: Board -> Bool
 -- need to test
 areRowsValid :: Board -> Bool
 areRowsValid b = and [isSequenceValid xs | xs <- b]
 
 -- TODO #9
+-- name: areColsValid
+-- description: return True/False depending whether ALL of the col sequences are valid or not
+-- input: a board
+-- output: True/False
+-- hint: use areRowsValid of the transposed board
+-- areColsValid :: Board -> Bool
 -- need to test
 areColsValid :: Board -> Bool
 areColsValid b = areRowsValid (transpose b)
@@ -229,7 +386,7 @@ main = do
 
     contents <- readFile fileName
     --board <- (getBoard contents)
-    putStrLn (show ( getNCols (getBoard contents)))
+    putStrLn (show ( getNRows (getBoard contents)))
 
 
 
@@ -246,3 +403,4 @@ main = do
   -- TODO #21: print the solutions found
 
   --print "Done!"
+
