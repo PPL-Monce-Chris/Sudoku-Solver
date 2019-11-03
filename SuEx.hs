@@ -246,7 +246,7 @@ areColsValid b = areRowsValid (transpose b)
 -- output: True/False
 -- hint: use list comprehension, isSequenceValid, and getBox
 -- areBoxesValid :: Board -> Bool
-
+areBoxesValid b = isSequenceValid [ getBox b x y | x <- [0..2], y <- [0..2]]
 -- TODO #11
 -- name: isValid
 -- description: return True/False depending whether the given board is valid sudoku configuration or not

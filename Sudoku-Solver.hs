@@ -1,6 +1,6 @@
 -- CS3210 - Principles of Programming Languages - Fall 2019
 -- Programming Assignment 02 - A Sudoku Solver
--- Author(s): Chris Johnson, Monce Romero
+-- Author(s): Chris Johnson, Moncerat Romero
 -- Date: 10/31/19
 
 import System.Environment
@@ -42,24 +42,30 @@ getNRows :: Board -> Int
 getNRows r = length(r)
 
 -- TODO #3
--- ned to test
+-- need to test
 getNCols :: Board -> Int
 getNCols b
-  | all (==length (head b)) [length x | x <- b] = length (head b)
+  | all (== length (head b)) [length x | x <- b] = length (head b)
   | otherwise = 0
 
 -- TODO #4
 -- need to test
+slice l st en = (drop st . take en) l
+
 getBox :: Board -> Int -> Int -> Sequence
-getBox board l1 l2 = concat [(drop l1)]
+getBox b x y = concat [ slice xs (x*3) (x*3+3) | xs <- (slice b (y*3) (y*3+3)) ]
 
---slice s b e = (drop b . take e) s
+-- getBox b x y = concat [ (drop xs (x3) (x3+3) . take xs (x3) (x3+3))  | xs <- ((drop b (y3) (y3+3) . take b (y3) (y3+3)) ) ]
 
+-- getBox board i1 i2 = concat [ slice box (i2*3) ((i2*3)+3) | box <- (slice board (i1*3) ((i1*3)+3) ]
 
 -- TODO #5
 -- need to test
 getEmptySpot :: Board -> (Int, Int)
-getEmptySpot b = head [(x, y) | x <- [0..8], y <- [0..8], (b !! y) !! x == 0]
+getEmptySpot b = head [(x, y)
+    | x <- [0..8]
+    , y <- [0..8]
+    , (b !! y) !! x == 0]
 -- x and y might need to be swapped at the end
 
 -- TODO #6
@@ -80,7 +86,7 @@ areRowsValid b = and [isSequenceValid xs | xs <- b]
 -- TODO #9
 -- need to test
 areColsValid :: Board -> Bool
-areColsValid b = areRowsValid (transpose b)
+areColsValid b = areRowsValid transpose b
 
 -- TODO #10
 -- name: areBoxesValid
@@ -88,7 +94,8 @@ areColsValid b = areRowsValid (transpose b)
 -- input: a board
 -- output: True/False
 -- hint: use list comprehension, isSequenceValid, and getBox
--- areBoxesValid :: Board -> Bool
+areBoxesValid :: Board -> Bool
+areBoxesValid b = areRowsValid [ getBox b x y | x <- [0..2], y <- [0..2]]
 
 -- TODO #11
 -- name: isValid
@@ -96,7 +103,9 @@ areColsValid b = areRowsValid (transpose b)
 -- input: a board
 -- output: True/False
 -- hint: use isGridValid, areRowsValid, areColsValid, and areBoxesValid
--- isValid :: Board -> Bool
+isValid :: Board -> Bool
+isValid board = isGridValid board && areRowsValid board && areColsValid board && areBoxesValid board
+
 
 -- TODO #12
 -- name: isCompleted
@@ -104,14 +113,16 @@ areColsValid b = areRowsValid (transpose b)
 -- input: a board
 -- output: True/False
 -- hint: use list comprehension and the elem function
--- isCompleted :: Board -> Bool
+isCompleted :: Board -> Bool
+isCompleted board = not(0 `elem` concat board)
 
 -- TODO #13
 -- name: isSolved
 -- description: return True/False depending whether the given board is solved or not; a board is solved if it is completed and still valid
 -- input: a board
 -- output: True/False
--- isSolved :: Board -> Bool
+isSolved :: Board -> Bool
+isSolved board = isValid board && isCompleted board
 
 -- ***** SETTER FUNCTIONS *****
 
@@ -123,7 +134,11 @@ areColsValid b = areRowsValid (transpose b)
 -- example 1: setRowAt [1, 2, 3, 0, 4, 5] 3 9 yields [1,2,3,9,4,5]
 -- example 2: setRowAt [1, 2, 3, 8, 4, 5] 3 9 yields [1,2,3,8,4,5]
 -- hint: use concatenation, take, and drop
--- setRowAt :: Sequence -> Int -> Int -> Sequence
+setRowAt :: Sequence -> Int -> Int -> Sequence
+setROwAt seq index value = if seq !! index == 0
+                                then concat [take index seq, [value], drop (index + 1) seq]
+                                else seq
+
 
 -- TODO #15
 -- name: setBoardAt
@@ -150,7 +165,8 @@ areColsValid b = areRowsValid (transpose b)
 --   [0,0,0,4,1,9,0,0,5],
 --   [0,0,0,0,8,0,0,7,9] ]
 -- hint: use concatenation and setRowAt
--- setBoardAt :: Board -> Int -> Int -> Int -> Board
+setBoardAt :: Board -> Int -> Int -> Int -> Board
+setBoardAt board i j val = concat [take i board, [setRowAt board !! i j val], drop (i + 1) board]
 
 -- TODO #16
 -- name: buildChoices
@@ -228,8 +244,9 @@ main = do
         else die "bye"
 
     contents <- readFile fileName
+    --let con =
     --board <- (getBoard contents)
-    putStrLn (show ( getNCols (getBoard contents)))
+    putStrLn (show ( isCompleted (getBoard contents)))
 
 
 
