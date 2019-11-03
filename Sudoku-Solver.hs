@@ -279,12 +279,13 @@ isSolved board = isValid board && isCompleted board
  example 2: setRowAt [1, 2, 3, 8, 4, 5] 3 9 yields [1,2,3,8,4,5]
  hint: use concatenation, take, and drop -}
 setRowAt :: Sequence -> Int -> Int -> Sequence
-setROwAt seq index value = if seq !! index == 0
-                                then concat [take index seq, [value], drop (index + 1) seq]
-                                | otherwise seq
-
+{-setROwAt seq index value = if seq !! index == 0
+                                then concat [take index seq], [value], [drop (index + 1) seq]
+                                else seq -}
+setRowAt seq index val | seq  !! index == 0 = (concat [take index seq], [val], [drop (index+1) seq])
 
 -- TODO #15
+
 -- name: setBoardAt
 {-
  description: given a board, two indexes i and j (representing coordinates), and a value, writes the value at the (i, j) coordinate, returning the new board, but only if the original value at the specified location is empty; otherwise, return the original board unchanged
@@ -311,9 +312,10 @@ setROwAt seq index value = if seq !! index == 0
    [0,0,0,0,8,0,0,7,9] ]
  hint: use concatenation and setRowAt -}
 setBoardAt :: Board -> Int -> Int -> Int -> Board
-setBoardAt board i j val = concat [take i board, [setRowAt board !! i j val], drop (i + 1) board]
+setBoardAt board i j val = concat [[take i board], [setRowAt board !! i j val], [drop (i + 1) board]]
 
 -- TODO #16
+
 -- name: buildChoices
 {-
  description: given a board and a two indexes i and j (representing coordinates), generate ALL possible boards, replacing the cell at (i, j) with ALL possible digits from 1 to 9; OK to assume that the cell at (i, j) is empty
@@ -362,6 +364,7 @@ setBoardAt board i j val = concat [take i board, [setRowAt board !! i j val], dr
  hint: use list comprehension and the function setBoardAt -}
 
  buildChoices :: Board -> Int -> Int -> [Board]
+ buildChoices board i j = [ setBoardAt board i j val | val <- [1..9] ]
 
 -- name: solve
 {-
