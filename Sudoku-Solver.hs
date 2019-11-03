@@ -34,7 +34,6 @@ toIntList seq = [ toInt [c] | c <- seq ]
 
 -- ***** GETTER FUNCTIONS *****
 
--- TODO #1
 -- name: getBoard
 {-
 description: convert given string to a sudoku board
@@ -55,7 +54,6 @@ hint: use lines to convert the string into a list of strings, and then apply toI
 getBoard :: [Char] -> Board
 getBoard seq = map toIntList(lines seq)
 
--- TODO #2
 -- name: getNRows
 {-
 description: given a board, return its number of rows
@@ -76,7 +74,6 @@ hint: use length
 getNRows :: Board -> Int
 getNRows row = length(row)
 
--- TODO #3
 -- name: getNCols
 {-
 description: given a board, return its number of columns or 0 if rows do not have the same number of columns
@@ -109,7 +106,6 @@ getNCols board
   | all (== length (head board)) [length x | x <- board] = length (head board)
   | otherwise = 0
 
--- TODO #4
 -- name: getBox
 {-
 description: given a board and box coordinates, return the correspondent box as a sequence
@@ -130,8 +126,6 @@ hint: use list comprehension to filter the rows of the target box; then transpos
 getBox :: Board -> Int -> Int -> Sequence
 getBox board x y = concat [ (drop  (x*3) . take  (x*3 + 3)) l | l <- (drop (y*3) . take (y*3 + 3)) board ]
 
-
--- TODO #5
  -- name: getEmptySpot
  {-
  description: given a board, return the first location that is empty (i.e., it has zero), if one exists; OK to assume that you will only call this function when you know that there is an empty spot
@@ -154,7 +148,6 @@ getEmptySpot board = head [(x, y)
     , y <- [0..8]
     , (board !! x) !! y == 0]
 
--- TODO #6
 -- name: isGridValid
  {-
  description: given a board, return True/False depending whether the given board constitutes a valid grid (i.e., #rows = #cols = 9) or not
@@ -192,7 +185,6 @@ getEmptySpot board = head [(x, y)
 isGridValid :: Board -> Bool
 isGridValid board = getNRows board == getNCols board
 
--- TODO #7
 -- name: isSequenceValid
 {-
  description: return True/False depending whether the given sequence is valid or not, according to sudoku rules
@@ -204,7 +196,6 @@ isGridValid board = getNRows board == getNCols board
 isSequenceValid :: Sequence -> Bool
 isSequenceValid seq = [l | l <- seq, l > 0] == nub [l | l <- seq, l > 0 ]
 
--- TODO #8
 -- name: areRowsValid
  {-
  description: return True/False depending whether ALL of the row sequences are valid or not
@@ -214,7 +205,6 @@ isSequenceValid seq = [l | l <- seq, l > 0] == nub [l | l <- seq, l > 0 ]
 areRowsValid :: Board -> Bool
 areRowsValid board = and [isSequenceValid l | l <- board]
 
--- TODO #9
 -- name: areColsValid
 {-
  description: return True/False depending whether ALL of the col sequences are valid or not
@@ -224,7 +214,6 @@ areRowsValid board = and [isSequenceValid l | l <- board]
 areColsValid :: Board -> Bool
 areColsValid board = areRowsValid (transpose board)
 
--- TODO #10
 -- name: areBoxesValid
  {-
  description: return True/False depending whether ALL of the box sequences are valid or not
@@ -234,7 +223,6 @@ areColsValid board = areRowsValid (transpose board)
 areBoxesValid :: Board -> Bool
 areBoxesValid board = areRowsValid [ getBox board x y | x <- [0..2], y <- [0..2]]
 
--- TODO #11
 -- name: isValid
 {-
  description: return True/False depending whether the given board is valid sudoku configuration or not
@@ -244,7 +232,6 @@ areBoxesValid board = areRowsValid [ getBox board x y | x <- [0..2], y <- [0..2]
 isValid :: Board -> Bool
 isValid board = isGridValid board && areRowsValid board && areColsValid board && areBoxesValid board
 
--- TODO #12
 -- name: isCompleted
  {-
  description: return True/False depending whether the given board is completed or not; a board is considered completed if there isn't a single empty cell
@@ -254,7 +241,6 @@ isValid board = isGridValid board && areRowsValid board && areColsValid board &&
 isCompleted :: Board -> Bool
 isCompleted board = not(0 `elem` concat board)
 
--- TODO #13
 -- name: isSolved
 {-
  description: return True/False depending whether the given board is solved or not; a board is solved if it is completed and still valid
@@ -265,7 +251,6 @@ isSolved board = isValid board && isCompleted board
 
 -- ***** SETTER FUNCTIONS *****
 
--- TODO #14
 -- name: setRowAt
 {-
  description: given a sequence, an index, and a value, writes the value at the index location, returning a new sequence, but only if the original value at the specified location is empty; otherwise, return the original sequence unchanged
@@ -278,7 +263,6 @@ setRowAt :: Sequence -> Int -> Int -> Sequence
 setRowAt seq index val | seq  !! index == 0 = (concat [take index seq, [val], drop (index+1) seq])
                        | otherwise = seq
 
--- TODO #15
 -- name: setBoardAt
 {-
  description: given a board, two indexes i and j (representing coordinates), and a value, writes the value at the (i, j) coordinate, returning the new board, but only if the original value at the specified location is empty; otherwise, return the original board unchanged
@@ -307,7 +291,6 @@ setRowAt seq index val | seq  !! index == 0 = (concat [take index seq, [val], dr
 setBoardAt :: Board -> Int -> Int -> Int -> Board
 setBoardAt board i j val = concat [take i board, [setRowAt (board !! i) j val], drop (i + 1) board]
 
--- TODO #16
 -- name: buildChoices
 {-
  description: given a board and a two indexes i and j (representing coordinates), generate ALL possible boards, replacing the cell at (i, j) with ALL possible digits from 1 to 9; OK to assume that the cell at (i, j) is empty
@@ -381,30 +364,20 @@ main = do
     inputStr <- getLine
     let fileName = inputStr ++ ".txt"
     x <- doesFileExist fileName
-    putStrLn fileName
+
     if x
-        then putStrLn "Sudoku board found."
+        then putStrLn "File found."
         else die "Not a valid file, bye."
 
     contents <- readFile fileName
+
     let board = (getBoard contents)
+
+    if (0 `elem` concat board)
+        then putStrLn "Board not solved, continuing..."
+        else die "No empty spaces, bye."
+
     let nonEmptyBoard = [new | new <- solve board, length new /= 0]
-    --print (show (map (nonEmptyBoard)))
     putStrLn (show (nonEmptyBoard))
 
-
     print "Done!"
-
-
-
-
---   TODO #17: validate the command-line and get the file name containing the board
---     done
---   TODO #18: read the contents of the board file into a string
---     done
---   TODO #19: create a board from the string board (hint: use getBoard)
---     done
-
---   TODO #20: use solve to find the solutions, disconsidering the ones that are [[]]
-
---   TODO #21: print the solutions found
