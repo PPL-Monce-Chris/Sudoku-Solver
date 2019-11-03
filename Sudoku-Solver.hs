@@ -1,7 +1,7 @@
- CS3210 - Principles of Programming Languages - Fall 2019
- Programming Assignment 02 - A Sudoku Solver
- Author(s): Chris Johnson, Moncerat Romero
- Date: 10/31/19
+ -- CS3210 - Principles of Programming Languages - Fall 2019
+ -- Programming Assignment 02 - A Sudoku Solver
+ -- Author(s): Chris Johnson, Moncerat Romero
+ -- Date: 10/31/19
 
 import System.Environment
 import System.IO
@@ -9,11 +9,12 @@ import Data.List
 import Data.Typeable
 import System.Directory
 import System.Exit
+import Data.Kind
 
 type Sequence = [Int]
 type Board    = [Sequence]
-
- ***** HELPER FUNCTIONS *****
+--type Empty    = [[a]]
+-- ***** HELPER FUNCTIONS *****
 
 -- name: toInt
 {- description: converts given parameter to integer
@@ -21,7 +22,7 @@ input: a string
 output: the string converted to integer
 example: toInt "123" returns 123 -}
 toInt :: [Char] -> Int
-toInt s = read s :: Int
+toInt seq = read seq :: Int
 
 -- name: toIntList
 {- description: converts given parameter to a sequence of integers (one digit at a time)
@@ -29,9 +30,9 @@ input: a string
 output: the string converted into a sequence of integers
 example: toIntList "123" returns [1, 2, 3] -}
 toIntList :: [Char] -> Sequence
-toIntList s = [ toInt [c] | c <- s ]
+toIntList seq = [ toInt [c] | c <- seq ]
 
- ***** GETTER FUNCTIONS *****
+-- ***** GETTER FUNCTIONS *****
 
 -- TODO #1
 -- name: getBoard
@@ -51,12 +52,10 @@ example: getBoard "530070000\n600195000\n098000060\n800060003\n400803001\n700020
 [0,0,0,0,8,0,0,7,9] ]
 hint: use lines to convert the string into a list of strings, and then apply toIntList on each of the strings of the list to return the board
 -}
-
 getBoard :: [Char] -> Board
-getBoard s = map toIntList(lines s)
+getBoard seq = map toIntList(lines seq)
 
 -- TODO #2
-
 -- name: getNRows
 {-
 description: given a board, return its number of rows
@@ -75,7 +74,7 @@ example: getNRows
 hint: use length
 -}
 getNRows :: Board -> Int
-getNRows r = length(r)
+getNRows row = length(row)
 
 -- TODO #3
 -- name: getNCols
@@ -106,8 +105,8 @@ example 2: getNCols
 hint: use length to create a list with all the sizes of each row from the board; then decide whether all of the rows have the same size, returning that size if yes, or 0 otherwise
 -}
 getNCols :: Board -> Int
-getNCols b
-  | all (== length (head b)) [length x | x <- b] = length (head b)
+getNCols board
+  | all (== length (head board)) [length x | x <- board] = length (head board)
   | otherwise = 0
 
 -- TODO #4
@@ -128,10 +127,8 @@ example: getBox
 [0,0,0,0,8,0,0,7,9] ] 1 1 yields [0,8,0,6,0,2,0,3,0]
 hint: use list comprehension to filter the rows of the target box; then transpose what you got and apply the same reasoning to filter the columns; use concat to return the sequence
 -}
-slice l st en = (drop st . take en) l
-
 getBox :: Board -> Int -> Int -> Sequence
-getBox b x y = concat [ slice xs (x*3) (x*3+3) | xs <- (slice b (y*3) (y*3+3)) ]
+getBox board x y = concat [ (drop  (x*3) . take  (x*3 + 3)) l | l <- (drop (y*3) . take (y*3 + 3)) board ]
 
 
 -- TODO #5
@@ -152,10 +149,10 @@ getBox b x y = concat [ slice xs (x*3) (x*3+3) | xs <- (slice b (y*3) (y*3+3)) ]
    [0,0,0,0,8,0,0,7,9] ] yields (0,2)
  hint: use list comprehension to generate all the coordinates of the board that are empty; use head to return the first coordinate of your list -}
 getEmptySpot :: Board -> (Int, Int)
-getEmptySpot b = head [(x, y)
+getEmptySpot board = head [(x, y)
     | x <- [0..8]
     , y <- [0..8]
-    , (b !! y) !! x == 0]
+    , (board !! x) !! y == 0]
 
 -- TODO #6
 -- name: isGridValid
@@ -193,19 +190,19 @@ getEmptySpot b = head [(x, y)
    [0,0,0,8,0,0,7,9] ] returns False
  hint: use getNRows and getNCols -}
 isGridValid :: Board -> Bool
-isGridValid b = getNRows b == getNCols b
+isGridValid board = getNRows board == getNCols board
 
 -- TODO #7
 -- name: isSequenceValid
 {-
  description: return True/False depending whether the given sequence is valid or not, according to sudoku rules
- input:  a sequence of digits from 0-9
+ input:  a sequence of digits from 0 to 9
  output: True/False
  example 1: isSequenceValid [5,3,0,0,7,0,0,0,0] yields True
  example 2: isSequenceValid [5,3,0,5,7,0,0,0,0] yields False
  hint: build a list with the digits from the given sequence that are different than zero; then determine whether there are digits that repeats in the created list-}
 isSequenceValid :: Sequence -> Bool
-isSequenceValid s = [xs | xs <- s, xs > 0] == nub [xs | xs <- s, xs > 0 ]
+isSequenceValid seq = [l | l <- seq, l > 0] == nub [l | l <- seq, l > 0 ]
 
 -- TODO #8
 -- name: areRowsValid
@@ -215,7 +212,7 @@ isSequenceValid s = [xs | xs <- s, xs > 0] == nub [xs | xs <- s, xs > 0 ]
  output: True/False
  hint: use list comprehension and isSequenceValid -}
 areRowsValid :: Board -> Bool
-areRowsValid b = and [isSequenceValid xs | xs <- b]
+areRowsValid board = and [isSequenceValid l | l <- board]
 
 -- TODO #9
 -- name: areColsValid
@@ -225,7 +222,7 @@ areRowsValid b = and [isSequenceValid xs | xs <- b]
  output: True/False
  hint: use areRowsValid of the transposed board -}
 areColsValid :: Board -> Bool
-areColsValid b = areRowsValid transpose b
+areColsValid board = areRowsValid (transpose board)
 
 -- TODO #10
 -- name: areBoxesValid
@@ -235,7 +232,7 @@ areColsValid b = areRowsValid transpose b
  output: True/False
  hint: use list comprehension, isSequenceValid, and getBox -}
 areBoxesValid :: Board -> Bool
-areBoxesValid b = areRowsValid [ getBox b x y | x <- [0..2], y <- [0..2]]
+areBoxesValid board = areRowsValid [ getBox board x y | x <- [0..2], y <- [0..2]]
 
 -- TODO #11
 -- name: isValid
@@ -246,7 +243,6 @@ areBoxesValid b = areRowsValid [ getBox b x y | x <- [0..2], y <- [0..2]]
  hint: use isGridValid, areRowsValid, areColsValid, and areBoxesValid -}
 isValid :: Board -> Bool
 isValid board = isGridValid board && areRowsValid board && areColsValid board && areBoxesValid board
-
 
 -- TODO #12
 -- name: isCompleted
@@ -267,7 +263,7 @@ isCompleted board = not(0 `elem` concat board)
 isSolved :: Board -> Bool
 isSolved board = isValid board && isCompleted board
 
- ***** SETTER FUNCTIONS *****
+-- ***** SETTER FUNCTIONS *****
 
 -- TODO #14
 -- name: setRowAt
@@ -279,13 +275,10 @@ isSolved board = isValid board && isCompleted board
  example 2: setRowAt [1, 2, 3, 8, 4, 5] 3 9 yields [1,2,3,8,4,5]
  hint: use concatenation, take, and drop -}
 setRowAt :: Sequence -> Int -> Int -> Sequence
-{-setROwAt seq index value = if seq !! index == 0
-                                then concat [take index seq], [value], [drop (index + 1) seq]
-                                else seq -}
-setRowAt seq index val | seq  !! index == 0 = (concat [take index seq], [val], [drop (index+1) seq])
+setRowAt seq index val | seq  !! index == 0 = (concat [take index seq, [val], drop (index+1) seq])
+                       | otherwise = seq
 
 -- TODO #15
-
 -- name: setBoardAt
 {-
  description: given a board, two indexes i and j (representing coordinates), and a value, writes the value at the (i, j) coordinate, returning the new board, but only if the original value at the specified location is empty; otherwise, return the original board unchanged
@@ -312,10 +305,9 @@ setRowAt seq index val | seq  !! index == 0 = (concat [take index seq], [val], [
    [0,0,0,0,8,0,0,7,9] ]
  hint: use concatenation and setRowAt -}
 setBoardAt :: Board -> Int -> Int -> Int -> Board
-setBoardAt board i j val = concat [[take i board], [setRowAt board !! i j val], [drop (i + 1) board]]
+setBoardAt board i j val = concat [take i board, [setRowAt (board !! i) j val], drop (i + 1) board]
 
 -- TODO #16
-
 -- name: buildChoices
 {-
  description: given a board and a two indexes i and j (representing coordinates), generate ALL possible boards, replacing the cell at (i, j) with ALL possible digits from 1 to 9; OK to assume that the cell at (i, j) is empty
@@ -362,9 +354,8 @@ setBoardAt board i j val = concat [[take i board], [setRowAt board !! i j val], 
    [0,0,0,0,8,0,0,7,9] ]
  ]
  hint: use list comprehension and the function setBoardAt -}
-
- buildChoices :: Board -> Int -> Int -> [Board]
- buildChoices board i j = [ setBoardAt board i j val | val <- [1..9] ]
+buildChoices :: Board -> Int -> Int -> [Board]
+buildChoices board i j = [ setBoardAt board i j val | val <- [1..9] ]
 
 -- name: solve
 {-
@@ -372,34 +363,37 @@ setBoardAt board i j val = concat [[take i board], [setRowAt board !! i j val], 
  input: a board
  output: a list of boards from the original board
  note: this code is given to you (just uncomment it when you are ready to test the solver)-}
- {-
- solve :: Board -> [Board]
- solve board
+
+solve :: Board -> [Board]
+solve board
    | isSolved board = [board]
-   | isCompleted board = [[[]]]
-   | not (isValid board) = [[[]]]
+   | isCompleted board = [[]]
+   | not (isValid board) = [[]]
    | otherwise = concat [ solve choice | choice <- buildChoices board i j ]
      where
        emptySpot = getEmptySpot board
        i = fst emptySpot
        j = snd emptySpot
-       -}
 
 -- program starts here
 main = do
-    putStrLn "What is the name of the file? Do not include extension."
+    putStrLn "What is the name of the txt file? Do not include extension."
     inputStr <- getLine
     let fileName = inputStr ++ ".txt"
     x <- doesFileExist fileName
     putStrLn fileName
     if x
-        then putStrLn"file Exists"
-        else die "bye"
+        then putStrLn "Sudoku board found."
+        else die "Not a valid file, bye."
 
     contents <- readFile fileName
-    let con =
-    board <- (getBoard contents)
-    putStrLn (show ( isCompleted (getBoard contents)))
+    let board = (getBoard contents)
+    let nonEmptyBoard = [new | new <- solve board, length new /= 0]
+    --print (show (map (nonEmptyBoard)))
+    putStrLn (show (nonEmptyBoard))
+
+
+    print "Done!"
 
 
 
@@ -414,5 +408,3 @@ main = do
 --   TODO #20: use solve to find the solutions, disconsidering the ones that are [[]]
 
 --   TODO #21: print the solutions found
-
---  print "Done!"
